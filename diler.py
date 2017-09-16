@@ -11,7 +11,7 @@ class Diler:
             self.clients[id].append(self.getCard())
         else:
             self.clients[id] = [self.getCard()]
-        return self.clients[id]
+        return self.clients[id][-1]
 
     def getCard(self):
         return self.deck.pop(randint(0, len(self.deck)-1))

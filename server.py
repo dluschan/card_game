@@ -1,38 +1,42 @@
 import socket
 import diler
 import cards
+import network
 
-class Server:
+class Game:
     def __init__(self):
-        self.clients = {}
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.s.bind(('127.0.0.1', 1234))
-        self.s.listen(5)
+        self.d = diler.Diler()
+        self.clients = [] #[(conn, addr)]
+        self.server = network.Server()
 
-    def send(self, msg):
-        conn, addr = self.s.accept()
-        conn.send(msg.encode('utf-8'))
+    def accept(self):
+        self.clients.append(self.server.accept())
+        print('Установлена связь с клиентом', self.clients[-1][1][1])
+        self.send((self.clients[-1][0]), str(self.clients[-1][1][1]))
 
-    def recv(self, size = 1024):
-        conn, addr = self.s.accept()
-        return conn.recv(size).decode('utf-8')
+    def send(self, conn, msg):
+        self.server.send(conn, msg)
 
-    def waitClient(self):
-        if self.recv() == 'Hi!':
-            client_id = len(self.clients)
-            self.clients.append(client_id)
-            print('Появился клиент', client_id)
-            self.send(str(client_id))
-            for i in range(2):
-                self.send(str(d.getCard()))
-            print('done')
+    def recv(self, conn):
+        return self.server.recv(conn)
 
-    def sendCard(self):
-        pass
+    def dispense(self):
+        for client in self.clients:
+            self.send(client[0], str(self.d.request(client[1][1])))
 
-d = diler.Diler()
-server = Server()
-while len(server.clients()) < 2:
-    server.waitClient()
-    server.sendCard()
+game = Game()
+ans = ''
+while ans != 'q':
+    print('a - установить соединение с новым клиентом')
+    print('s - отправить всем клиентам по одной карте')
+    print('q - quit')
+    ans = input('Введите команду(a/w/s/q): ')
+    if ans == 'a':
+        game.accept()
+    elif ans == 's':
+        game.dispense()
+    elif ans == 'q':
+        print('By!')
+        exit(0)
+    else:
+        print('Команда не распознана')

@@ -1,7 +1,7 @@
 import cards
-import sender
+import network
 
-class Client:
+class Player:
     def __init__(self):
         self.cards = []
         self.coins = 1000
@@ -11,13 +11,13 @@ class Client:
 
     def send(self, msg):
         if self.s is None:
-            self.s = sender.Sender()
+            self.s = network.Client()
         self.s.send(msg)
 
     def recv(self):
         return self.s.recv()
 
-player = Client()
+player = Player()
 ans = ''
 while ans != 'q':
     print('r - registration')
@@ -26,14 +26,13 @@ while ans != 'q':
     print('q - quit')
     ans = input('Введите команду(r/w/s/q): ')
     if ans == 'r':
-        player.send('Hi!')
+        player.send('Hello')
         player.id = player.recv()
         print("Регистрация на сервере успешно выполнена", player.id)
     elif ans == 'w':
-        print('Запрос карт')
-        player.send('Request')
-        while (len(player.cards)) < 2:
-            player.cards.append(player.recv())
+        print('Ожидание карт')
+        player.cards.append(player.recv())
+        print('Получена карта', player.cards[-1])
     elif ans == 'q':
         print('By!')
         exit(0)
