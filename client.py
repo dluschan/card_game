@@ -8,6 +8,7 @@ class Player:
         self.id = None
         self.server = None
         self.s = None
+        self.main()
 
     def send(self, msg):
         if self.s is None:
@@ -15,29 +16,28 @@ class Player:
         self.s.send(msg)
 
     def recv(self):
+        if self.s is None:
+            self.s = network.Client()
         return self.s.recv()
 
-player = Player()
-ans = ''
-while ans != 'q':
-    print('r - registration')
-    print('w - wait')
-    print('s - show')
-    print('q - quit')
-    ans = input('Введите команду(r/w/s/q): ')
-    if ans == 'r':
-        player.send('Hello')
-        player.id = player.recv()
-        print("Регистрация на сервере успешно выполнена", player.id)
-    elif ans == 'w':
+    def wait(self):
         print('Ожидание карт')
-        player.cards.append(player.recv())
-        print('Получена карта', player.cards[-1])
-    elif ans == 'q':
-        print('By!')
-        exit(0)
-    elif ans == 's':
-        for c in player.cards:
-            print(str(c))
-    else:
-        print('Команда не распознана')
+        for i in range(2):
+            self.cards.append(self.recv())
+            print('Получена карта', self.cards[-1])
+
+    def game(self):
+        pass
+
+    def main(self):
+        if input('Подключиться к серверу? (y or n)').lower() == 'y':
+            self.send('Hello')
+            self.id = self.recv()
+            print("Регистрация на сервере успешно выполнена.")
+            self.wait()
+            self.game()
+        else:
+            print('By!')
+            exit(0)
+
+player = Player()

@@ -1,4 +1,3 @@
-import socket
 import diler
 import cards
 import network
@@ -8,6 +7,24 @@ class Game:
         self.d = diler.Diler()
         self.clients = [] #[(conn, addr)]
         self.server = network.Server()
+        self.main()
+
+    def main(self):
+        ans = ''
+        while ans != 'q':
+            print('a - установить соединение с новым клиентом')
+            print('s - начать игру')
+            print('q - quit')
+            ans = input('Введите команду(a/w/s/q): ')
+            if ans == 'a':
+                self.accept()
+            elif ans == 's':
+                self.start()
+            elif ans == 'q':
+                print('By!')
+                exit(0)
+            else:
+                print('Команда не распознана')
 
     def accept(self):
         self.clients.append(self.server.accept())
@@ -20,23 +37,17 @@ class Game:
     def recv(self, conn):
         return self.server.recv(conn)
 
+    def start(self):
+        for i in range(2):
+            self.dispense()
+        self.by()
+
+    def by(self):
+        for client in self.clients:
+            self.send(client[0], "Спасибо за игру!")
+
     def dispense(self):
         for client in self.clients:
             self.send(client[0], str(self.d.request(client[1][1])))
 
 game = Game()
-ans = ''
-while ans != 'q':
-    print('a - установить соединение с новым клиентом')
-    print('s - отправить всем клиентам по одной карте')
-    print('q - quit')
-    ans = input('Введите команду(a/w/s/q): ')
-    if ans == 'a':
-        game.accept()
-    elif ans == 's':
-        game.dispense()
-    elif ans == 'q':
-        print('By!')
-        exit(0)
-    else:
-        print('Команда не распознана')
