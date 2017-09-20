@@ -27,7 +27,9 @@ class Player:
             print('Получена карта', self.cards[-1])
 
     def game(self):
-        pass
+        print(self.recv())
+        print(self.recv())
+        print(self.recv())
 
     def main(self):
         if input('Подключиться к серверу? (y or n)').lower() == 'y':

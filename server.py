@@ -40,11 +40,15 @@ class Game:
     def start(self):
         for i in range(2):
             self.dispense()
-        self.by()
+        self.broadcast(self.d.flop())
+        self.broadcast(self.d.turn())
+        self.broadcast(self.d.river())
+        self.broadcast(self.d.opening())
+        self.broadcast("Спасибо за игру!")
 
-    def by(self):
+    def broadcast(self, msg):
         for client in self.clients:
-            self.send(client[0], "Спасибо за игру!")
+            self.send(client[0], msg)
 
     def dispense(self):
         for client in self.clients:
