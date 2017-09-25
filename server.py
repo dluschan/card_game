@@ -4,7 +4,7 @@ import network
 
 class Game:
     def __init__(self):
-        self.d = diler.Diler()
+        self.d = diler.Diler(self)
         self.clients = [] #[(conn, addr)]
         self.server = network.Server()
         self.main()
@@ -52,6 +52,6 @@ class Game:
 
     def dispense(self):
         for client in self.clients:
-            self.send(client[0], str(self.d.request(client[1][1])))
+            self.send(client[0], str(self.d.request(client)))
 
 game = Game()
