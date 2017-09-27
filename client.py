@@ -4,7 +4,7 @@ import network
 class Player:
     def __init__(self):
         self.cards = []
-        self.coins = 1000
+        self.coins = 10000
         self.id = None
         self.server = None
         self.s = None
@@ -54,8 +54,9 @@ class Player:
 
     def main(self):
         if input('Подключиться к серверу (yes(y)/no(n))?: ').lower() == 'y':
-            self.id = self.recv()
+            self.id, self.money = self.recv().split()
             print("Регистрация на сервере успешно выполнена.")
+            print("id:", self.id, "money", self.money)
             self.wait()
             self.game()
         else:

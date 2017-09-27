@@ -5,7 +5,7 @@ import network
 class Game:
     def __init__(self):
         self.d = diler.Diler(self)
-        self.clients = [] #[(conn, addr)]
+        self.clients = [] #[(conn, addr, money)]
         self.server = network.Server()
         self.main()
 
@@ -27,9 +27,18 @@ class Game:
                 print('Команда не распознана')
 
     def accept(self):
-        self.clients.append(self.server.accept())
-        print('Установлена связь с клиентом', self.clients[-1][1][1])
-        self.send((self.clients[-1][0]), str(self.clients[-1][1][1]))
+        n = self.server.accept()
+        bool_1 = True
+        q = 0
+        for i in self.clients:
+            if(n[1] == i[1]):
+                bool_1 = False
+                break
+            q += 1
+        if(bool_1):
+            self.clients += [(n[0], n[1], 10000)]
+        print('Установлена связь с клиентом', self.clients[q][1][1])
+        self.send(self.clients[-1][0], str(self.clients[q][1][1]) + " " + str(self.clients[q][2]))
 
     def send(self, conn, msg):
         self.server.send(conn, msg)
