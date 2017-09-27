@@ -1,6 +1,7 @@
 import socket
 
 class Connection:
+    "Класс для констант подключения"
     adress = '127.0.0.1'
     port = 1234
     players = 2
