@@ -26,14 +26,31 @@ class Player:
             self.cards.append(self.recv())
             print('Получена карта', self.cards[-1])
 
+    def round(self):
+        mail = self.recv()
+        while 'ask' in mail:
+            while True:
+                ans = input('сделайте ваш ход (pass(p)/call(c)/rise(r)): ')
+                if ans == 'p':
+                    self.send('pass')
+                    break
+                elif ans == 'c':
+                    self.send('call')
+                    break
+                elif ans == 'r':
+                    self.send('rise')
+                    break
+                else:
+                    print('я вас не понимаю')
+            mail = self.recv()
+        print(mail)
+
     def game(self):
-        print(self.recv())
-        print(self.recv())
-        print(self.recv())
+        for i in range(3):
+            self.round()
 
     def main(self):
-        if input('Подключиться к серверу? (y or n)').lower() == 'y':
-            self.send('Hello')
+        if input('Подключиться к серверу (yes(y)/no(n))?: ').lower() == 'y':
             self.id = self.recv()
             print("Регистрация на сервере успешно выполнена.")
             self.wait()

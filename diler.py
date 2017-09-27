@@ -26,6 +26,9 @@ class Diler:
         class Rised(Ready):
             pass
 
+        class Pass(Ready):
+            pass
+
         def __init__(self, id, conn):
             self.conn = conn
             self.id = id
@@ -69,26 +72,41 @@ class Diler:
         k = 0
         while not all([client.ready() for client in self.clients]):
             if not self.clients[k].ready():
-                self.server.send(self.clients[k].conn, 'ваш ход')
+                self.server.send(self.clients[k].conn, 'ask')
+                print('отправлен запрос клиенту', self.clients[k].id)
+                ans = self.server.recv(self.clients[k].conn)
+                print('ответ от клиента', self.clients[k].id, ans)
+                if ans == 'pass':
+                    self.clients[k].status = Diler.Client.Pass()
+                elif ans == 'call':
+                    self.clients[k].status = Diler.Client.Called()
+                elif ans == 'rise':
+                    for c in filter(lambda x: x.status != Diler.Client.Pass(), self.clients):
+                        c.status = Diler.Client.NotReady()
+                    self.clients[k].status = Diler.Client.Rised()
+                else:
+                    self.clients[k].status = Diler.Client.Pass()
+                    print('error: непонятный ответ от клиента')
             k = (k + 1) % len(self.clients)
 
     def flop(self):
-        print("выдача общих карт")
         self.roundRun()
         for i in range(3):
             self.table.append(self.getCard())
-        print(' '.join(map(str, self.table)))
+        print('flop', ' '.join(map(str, self.table[0: 3])))
         return ' '.join(map(str, self.table))
 
     def turn(self):
         self.roundRun()
         self.table.append(self.getCard())
-        return ' '.join(map(str, self.table))
+        print('turn', str(self.table[-1]))
+        return str(self.table[-1])
 
     def river(self):
         self.roundRun()
         self.table.append(self.getCard())
-        return ' '.join(map(str, self.table))
+        print('river', str(self.table[-1]))
+        return str(self.table[-1])
 
     def opening(self):
         self.roundRun()
