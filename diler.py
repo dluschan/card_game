@@ -1,11 +1,8 @@
 from cards import createCards
-from random import randint, choice
+from random import randint
+from comparator import Comparator
 
 class Diler:
-    class Comparator:
-        def compare(self, clients, table):
-            return [choice(list(clients.keys()))]
-
     class Client:
         class Status:
             pass
@@ -53,7 +50,7 @@ class Diler:
         self.deck = createCards()
         self.table = []
         self.clients = []
-        self.comparator = Diler.Comparator()
+        self.comparator = Comparator()
 
     def getClient(self, client):
         missing = Diler.Client(client[1][1], client[0])
