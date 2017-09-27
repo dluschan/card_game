@@ -27,26 +27,29 @@ class Player:
             print('Получена карта', self.cards[-1])
 
     def round(self):
-        mail = self.recv()
-        while 'ask' in mail:
-            while True:
-                ans = input('сделайте ваш ход (pass(p)/call(c)/rise(r)): ')
-                if ans == 'p':
-                    self.send('pass')
-                    break
-                elif ans == 'c':
-                    self.send('call')
-                    break
-                elif ans == 'r':
-                    self.send('rise')
-                    break
-                else:
-                    print('я вас не понимаю')
-            mail = self.recv()
-        print(mail)
+        message = self.recv()
+        while 'ask' in message or 'info' in message:
+            if 'info' in message:
+                print(message)
+            if 'ask' in message:
+                while True:
+                    ans = input('сделайте ваш ход (pass(p)/call(c)/rise(r)): ')
+                    if ans == 'p':
+                        self.send('pass')
+                        break
+                    elif ans == 'c':
+                        self.send('call')
+                        break
+                    elif ans == 'r':
+                        self.send('rise')
+                        break
+                    else:
+                        print('я вас не понимаю')
+            message = self.recv()
+        print(message)
 
     def game(self):
-        for i in range(3):
+        for i in range(4):
             self.round()
 
     def main(self):

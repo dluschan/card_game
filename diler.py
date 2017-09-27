@@ -1,7 +1,11 @@
 from cards import createCards
-from random import randint
+from random import randint, choice
 
 class Diler:
+    class Comparator:
+        def compare(self, clients, table):
+            return [choice(list(clients.keys()))]
+
     class Client:
         class Status:
             pass
@@ -49,6 +53,7 @@ class Diler:
         self.deck = createCards()
         self.table = []
         self.clients = []
+        self.comparator = Diler.Comparator()
 
     def getClient(self, client):
         missing = Diler.Client(client[1][1], client[0])
@@ -69,19 +74,20 @@ class Diler:
         return self.clients
 
     def roundRun(self):
+        for client in filter(lambda x: type(x.status) != Diler.Client.Pass(), self.clients):
+            client.status = Diler.Client.NotReady()
         k = 0
         while not all([client.ready() for client in self.clients]):
             if not self.clients[k].ready():
                 self.server.send(self.clients[k].conn, 'ask')
-                print('отправлен запрос клиенту', self.clients[k].id)
                 ans = self.server.recv(self.clients[k].conn)
-                print('ответ от клиента', self.clients[k].id, ans)
+                self.server.broadcast('info: игрок ' + str(self.clients[k].id) + ' ответил ' + ans)
                 if ans == 'pass':
                     self.clients[k].status = Diler.Client.Pass()
                 elif ans == 'call':
                     self.clients[k].status = Diler.Client.Called()
                 elif ans == 'rise':
-                    for c in filter(lambda x: x.status != Diler.Client.Pass(), self.clients):
+                    for c in filter(lambda x: type(x.status) != Diler.Client.Pass(), self.clients):
                         c.status = Diler.Client.NotReady()
                     self.clients[k].status = Diler.Client.Rised()
                 else:
@@ -110,4 +116,12 @@ class Diler:
 
     def opening(self):
         self.roundRun()
-        return ''
+        clients = {}
+        for client in filter(lambda x: type(x.status) != Diler.Client.Pass(), self.clients):
+            clients[client.id] = client.cards
+        win = self.comparator.compare(clients, self.table)
+        if len(win) == 1:
+            res = 'победитель: ' + str(win[0])
+        else:
+            res = 'победители: ' + ', '.join(map(str, win))
+        return res
