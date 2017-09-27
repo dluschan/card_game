@@ -71,7 +71,10 @@ class Diler:
         return self.clients
 
     def roundRun(self):
-        for client in filter(lambda x: type(x.status) != Diler.Client.Pass(), self.clients):
+        if len(list(filter(lambda x: type(x.status) != Diler.Client.Pass, self.clients))) < 2:
+            return
+
+        for client in filter(lambda x: type(x.status) != Diler.Client.Pass, self.clients):
             client.status = Diler.Client.NotReady()
         k = 0
         while not all([client.ready() for client in self.clients]):
@@ -84,7 +87,7 @@ class Diler:
                 elif ans == 'call':
                     self.clients[k].status = Diler.Client.Called()
                 elif ans == 'rise':
-                    for c in filter(lambda x: type(x.status) != Diler.Client.Pass(), self.clients):
+                    for c in filter(lambda x: type(x.status) != Diler.Client.Pass, self.clients):
                         c.status = Diler.Client.NotReady()
                     self.clients[k].status = Diler.Client.Rised()
                 else:
@@ -114,7 +117,7 @@ class Diler:
     def opening(self):
         self.roundRun()
         clients = {}
-        for client in filter(lambda x: type(x.status) != Diler.Client.Pass(), self.clients):
+        for client in filter(lambda x: type(x.status) != Diler.Client.Pass, self.clients):
             clients[client.id] = client.cards
         win = self.comparator.compare(clients, self.table)
         if len(win) == 1:
