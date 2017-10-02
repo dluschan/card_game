@@ -31,6 +31,7 @@ class Diler:
             pass
 
         def __init__(self, id, conn):
+            self.rise_client = None
             self.conn = conn
             self.id = id
             self.cards = []
@@ -76,7 +77,9 @@ class Diler:
 
         for client in filter(lambda x: type(x.status) != Diler.Client.Pass, self.clients):
             client.status = Diler.Client.NotReady()
-        k = 0
+            
+        k = 0 if rise_client is None else rise_client
+        
         while not all([client.ready() for client in self.clients]):
             if not self.clients[k].ready():
                 self.server.send(self.clients[k].conn, 'ask')
@@ -90,6 +93,7 @@ class Diler:
                     for c in filter(lambda x: type(x.status) != Diler.Client.Pass, self.clients):
                         c.status = Diler.Client.NotReady()
                     self.clients[k].status = Diler.Client.Rised()
+                    self.rise_client = k
                 else:
                     self.clients[k].status = Diler.Client.Pass()
                     print('error: непонятный ответ от клиента')
