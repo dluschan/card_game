@@ -52,6 +52,7 @@ class Diler:
         self.table = []
         self.clients = []
         self.comparator = Comparator()
+        self.rise_client = None
 
     def getClient(self, client):
         missing = Diler.Client(client[1][1], client[0])
@@ -78,7 +79,7 @@ class Diler:
         for client in filter(lambda x: type(x.status) != Diler.Client.Pass, self.clients):
             client.status = Diler.Client.NotReady()
             
-        k = 0 if rise_client is None else rise_client
+        k = 0 if self.rise_client is None else self.rise_client
         
         while not all([client.ready() for client in self.clients]):
             if not self.clients[k].ready():
