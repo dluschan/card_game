@@ -54,9 +54,14 @@ class Player:
 
     def main(self):
         if input('Подключиться к серверу (yes(y)/no(n))?: ').lower() == 'y':
-            self.id, self.money = self.recv().split()
+            print(self.recv())#Логиин
+            self.send(input())
+            print(self.recv())#Добро пожаловать
+            money = self.recv()
+            self.send("All is norm")
+            print('Ваши деньги:' + money + "\n")
             print("Регистрация на сервере успешно выполнена.")
-            print("id:", self.id, "money", self.money)
+            self.id = self.recv()
             self.wait()
             self.game()
         else:
