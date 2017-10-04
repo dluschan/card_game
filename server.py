@@ -1,6 +1,7 @@
 import diler
 import cards
 import network
+import socket
 import os
 
 class Game:
@@ -27,7 +28,11 @@ class Game:
             print('q - quit')
             ans = input('Введите команду(a/w/s/q): ')
             if ans == 'a':
-                self.accept()
+                try:
+                    self.accept()
+                except socket.timeout:
+                    print('Клиент не отвечает')
+                    continue
             elif ans == 's':
                 self.start()
             elif ans == 'q':

@@ -1,6 +1,7 @@
 import socket
 
 class Connection:
+    timeout = 5
     adress = '127.0.0.1'
     port = 1234
     players = 2
@@ -26,6 +27,7 @@ class Server:
     Занимается созданием сокета, установлением связи с клиентами, а также и получением и отправкой им сообщений."""
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.settimeout(Connection.timeout)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket.bind((Connection.adress, Connection.port))
         self.socket.listen(Connection.players)
