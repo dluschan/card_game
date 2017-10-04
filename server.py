@@ -82,6 +82,7 @@ class Game:
         self.broadcast(self.d.turn())
         self.broadcast(self.d.river())
         self.broadcast(self.d.opening())
+        self.d.next_turn(self)
         self.broadcast("Спасибо за игру!")
 
     def broadcast(self, msg):
