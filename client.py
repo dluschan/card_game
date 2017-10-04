@@ -4,7 +4,7 @@ import network
 class Player:
     def __init__(self):
         self.cards = []
-        self.coins = 10000
+        self.coins = 1000
         self.id = None
         self.server = None
         self.s = None

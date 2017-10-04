@@ -132,3 +132,6 @@ class Diler:
         else:
             res = 'победители: ' + ', '.join(map(str, win))
         return res
+
+    def next_turn(self):
+        self.clients.append(self.clients.pop(0))
