@@ -1,6 +1,7 @@
 from cards import createCards
 from random import randint
 from comparator import Comparator
+from time import sleep
 
 class Diler:
     class Client:
@@ -83,6 +84,7 @@ class Diler:
         
         while not all([client.ready() for client in self.clients]):
             if not self.clients[k].ready():
+                sleep(0.01)
                 self.server.send(self.clients[k].conn, 'ask')
                 ans = self.server.recv(self.clients[k].conn)
                 self.server.broadcast('info: игрок ' + str(self.clients[k].id) + ' ответил ' + ans)
