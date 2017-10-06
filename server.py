@@ -3,6 +3,7 @@ import cards
 import network
 import socket
 import os
+import time
 
 class Game:
     def __init__(self):
@@ -18,7 +19,6 @@ class Game:
             print('Создаю новый файл')
             self.f = open('file.txt', 'w+')
         self.main()
-
 
     def main(self):
         ans = ''
@@ -71,7 +71,7 @@ class Game:
             if not(s in self.logins):
                 self.send(self.clients[-1][0], 'Добро пожаловать, новый игрок')
                 self.logins[s] = self.money #10000 - изначальное кол-во денег
-
+        time.sleep(0.01)
         self.send(self.clients[-1][0], str(self.money))
         self.recv(self.clients[-1][0])
         self.send((self.clients[-1][0]), str(self.clients[-1][1][1]))
