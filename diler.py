@@ -19,13 +19,16 @@ class Diler:
         class Check(Ready):
             pass
 
-        class AllIn(Ready):
+        class Bet(Ready):
             pass
 
-        class Called(Ready):
+        class AllIn(Bet):
             pass
 
-        class Rised(Ready):
+        class Called(Bet):
+            pass
+
+        class Rised(Bet):
             pass
 
         class Pass(Ready):
@@ -37,6 +40,9 @@ class Diler:
             self.id = id
             self.cards = []
             self.status = Diler.Client.NotReady()
+            self.bet = 0
+            self.money = 1000
+            self.pass = False
 
         def __eq__(self, other):
             return self.id == other.id
@@ -44,8 +50,8 @@ class Diler:
         def addCard(self, card):
             self.cards.append(card)
 
-        def ready(self):
-            return self.status.ready()
+        def ready(self, max_bet):
+            return self.money == 0 or self.bet >= max_bet or self.pass
 
     def __init__(self, server):
         self.server = server
@@ -54,7 +60,9 @@ class Diler:
         self.clients = []
         self.comparator = Comparator()
         self.rise_client = None
-        self.bet = False
+        self.bet = 0
+        self.bank = 0
+        self.big_blind = 100
 
     def getClient(self, client):
         missing = Diler.Client(client[1][1], client[0])
@@ -75,33 +83,46 @@ class Diler:
         return self.clients
 
     def roundRun(self):
-        if len(list(filter(lambda x: type(x.status) != Diler.Client.Pass, self.clients))) < 2:
-            return
-
         for client in filter(lambda x: type(x.status) != Diler.Client.Pass, self.clients):
             client.status = Diler.Client.NotReady()
             
         k = 0 if self.rise_client is None else self.rise_client
         
-        while not all([client.ready() for client in self.clients]):
+        while not all([client.ready() for client in self.clients]) or len(list(filter(lambda x: type(x.status) != Diler.Client.Pass, self.clients))) < 2:
             if not self.clients[k].ready():
                 sleep(0.01)
-                self.server.send(self.clients[k].conn, 'ask')
+                if self.bet > 0:
+                    self.server.send(self.clients[k].conn, 'ask1 ' + str(bet - self.clients[k].bet))
+                else:
+                    self.server.send(self.clients[k].conn, 'ask0')
                 ans = self.server.recv(self.clients[k].conn)
                 self.broadcast('info: игрок ' + str(self.clients[k].id) + ' ответил ' + ans)
-                if ans == 'pass':
+                if ans == 'check':
+                    self.clients[k].status = Diler.Client.Check()
+                elif ans == 'pass':
                     self.clients[k].status = Diler.Client.Pass()
                 elif ans == 'call':
                     self.clients[k].status = Diler.Client.Called()
-                elif ans == 'rise':
+                elif ans[:4] == 'rise' or ans[:3] == 'bet':
                     for c in filter(lambda x: type(x.status) != Diler.Client.Pass, self.clients):
                         c.status = Diler.Client.NotReady()
                     self.clients[k].status = Diler.Client.Rised()
                     self.rise_client = k
+                    bet = int(ans[4:])
+                    self.bank += bet
+                    self.clients[k].bet = bet
                 else:
                     self.clients[k].status = Diler.Client.Pass()
                     print('error: непонятный ответ от клиента')
             k = (k + 1) % len(self.clients)
+
+    def blind(self):
+        self.bank += self.big_blind // 2
+        self.bank += self.big_blind
+        self.clients[0].bed(self.big_blind // 2)
+        self.clients[1].bed(self.big_blind)
+        self.bet = True
+        return "Игрок " + str(self.clients[0].id) + " поставил " + str(self.big_blind // 2) + ", игрок " + str(self.clients[1].id) + " поставил " + str(self.big_blind)
 
     def flop(self):
         self.roundRun()
@@ -135,6 +156,7 @@ class Diler:
         return res
 
     def game(self):
+        self.broadcast(self.blind())
         self.broadcast(self.flop())
         self.broadcast(self.turn())
         self.broadcast(self.river())
