@@ -54,6 +54,7 @@ class Diler:
         self.clients = []
         self.comparator = Comparator()
         self.rise_client = None
+        self.bet = False
 
     def getClient(self, client):
         missing = Diler.Client(client[1][1], client[0])
@@ -87,7 +88,7 @@ class Diler:
                 sleep(0.01)
                 self.server.send(self.clients[k].conn, 'ask')
                 ans = self.server.recv(self.clients[k].conn)
-                self.server.broadcast('info: игрок ' + str(self.clients[k].id) + ' ответил ' + ans)
+                self.broadcast('info: игрок ' + str(self.clients[k].id) + ' ответил ' + ans)
                 if ans == 'pass':
                     self.clients[k].status = Diler.Client.Pass()
                 elif ans == 'call':
@@ -132,6 +133,18 @@ class Diler:
         else:
             res = 'победители: ' + ', '.join(map(str, win))
         return res
+
+    def game(self):
+        self.broadcast(self.flop())
+        self.broadcast(self.turn())
+        self.broadcast(self.river())
+        self.broadcast(self.opening())
+        self.next_turn()
+        self.broadcast("Спасибо за игру!")
+
+    def broadcast(self, msg):
+        for client in self.clients:
+            self.server.send(client.conn, msg)
 
     def next_turn(self):
         self.clients.append(self.clients.pop(0))

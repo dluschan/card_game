@@ -76,7 +76,6 @@ class Game:
         self.recv(self.clients[-1][0])
         self.send((self.clients[-1][0]), str(self.clients[-1][1][1]))
 
-
     def send(self, conn, msg):
         self.server.send(conn, msg)
 
@@ -86,16 +85,7 @@ class Game:
     def start(self):
         for i in range(2):
             self.dispense()
-        self.broadcast(self.d.flop())
-        self.broadcast(self.d.turn())
-        self.broadcast(self.d.river())
-        self.broadcast(self.d.opening())
-        self.d.next_turn(self)
-        self.broadcast("Спасибо за игру!")
-
-    def broadcast(self, msg):
-        for client in self.clients:
-            self.send(client[0], msg)
+        self.d.game()
 
     def dispense(self):
         for client in self.clients:
