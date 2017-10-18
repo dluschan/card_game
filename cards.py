@@ -28,11 +28,11 @@ class Value:
 
 class Card:
     def __init__(self, value, suit):
-        self.suit = suit()
+        self.suit = suit
         self.value = Value(value)
 
     def __str__(self):
-        return ('\033[31m' if type(self.suit) in [Diamonds, Hearts] else '') + str(self.value) + str(self.suit) + ('\033[0m' if type(self.suit) in [Diamonds, Hearts] else '')
+        return ('\033[31m' if type(self.suit) in [Diamonds, Hearts] else '') + str(self.value) + str(self.suit()) + ('\033[0m' if type(self.suit) in [Diamonds, Hearts] else '')
 
 Suits = [Diamonds, Clubs, Hearts, Spades]
 

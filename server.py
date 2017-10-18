@@ -7,7 +7,7 @@ import time
 
 class Game:
     def __init__(self):
-        self.d = diler.Diler(self)
+        self.diler = diler.Diler(self)
         self.logins = {}
         self.money = 10000
         self.clients = [] #[(conn, addr)]
@@ -34,7 +34,7 @@ class Game:
                     print('Клиент не отвечает')
                     continue
             elif ans == 's':
-                self.start()
+                self.diler.game()
             elif ans == 'q':
                 print('By!')
                 self.f = open('file.txt', 'w')
@@ -81,14 +81,5 @@ class Game:
 
     def recv(self, conn):
         return self.server.recv(conn)
-
-    def start(self):
-        for i in range(2):
-            self.dispense()
-        self.d.game()
-
-    def dispense(self):
-        for client in self.clients:
-            self.send(client[0], str(self.d.request(client)))
 
 game = Game()
