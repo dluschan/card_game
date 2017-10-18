@@ -78,16 +78,45 @@ class StraightFlush():
     def check(cards):
         return Straight.check(cards) and Flush.check(cards)
 
-def compare(cards):
-    for c in combinations:
-        if c.check(cards):
-            return c()
-
 combinations = [StraightFlush, Quads, FullHouse, Flush, Straight, Set, TwoPairs, Pair, High]
 
+class Comparator:
+    def combine(self, cards):
+        r = []
+        for i in range(6):
+            for j in range(i + 1, 7):
+                 r.append(cards[:i] + cards[i + 1: j] + cards[j + 1:])
+        return r
+
+    def compare(self, clients, table):
+        res = {}
+        for client_id, cards in clients:
+            res[max(map(max_combine, combine(cards + table)))].append(client_id)
+        ans = []
+        for key in sorted(res):
+            ans.append(res[key])
+        return ans
+
+    def max_combine(cards):
+        for c in combinations:
+            if c.check(cards):
+                return c()
+
 Suits = [Diamonds, Clubs, Hearts, Spades]
-cards = [Card(2, Diamonds), Card(5, Diamonds), Card(5, Diamonds), Card(5, Diamonds), Card(2, Diamonds)]
+
+cards = [
+        Card(2, Diamonds),
+        Card(5, Diamonds),
+        Card(9, Diamonds),
+        Card(11, Diamonds),
+        Card(0, Diamonds),
+        Card(2, Hearts),
+        Card(5, Hearts),
+        Card(5, Clubs),
+        Card(5, Clubs),
+        Card(2, Clubs)
+]
+
 #cards = [Card(i, Diamonds) for i in range(2, 7)]
 
-print(compare(cards))
-print(' '.join(map(str, cards)))
+print(*cards)
